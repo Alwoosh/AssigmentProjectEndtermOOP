@@ -22,12 +22,3 @@
     *   **Factory Method:** `MembershipFactory` для создания различных типов абонементов.
     *   **Builder:** `TrainingPlan.Builder` для гибкого создания планов тренировок.
     *   **Strategy (Lambda):** `NotificationService` для гибкой отправки уведомлений.
-
-### Setup
-Для запуска проекта необходимо создать файл `config.properties` в корневой директории со следующими полями (файл скрыт через `.gitignore` в целях безопасности):
-```properties
-db.url=jdbc:postgresql://your-host:port/postgres
-db.user=your-username
-db.password=your-password
-```
-Скомпилируйте и запустите `Main.java`.
