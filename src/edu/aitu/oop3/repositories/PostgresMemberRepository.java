@@ -5,6 +5,8 @@ import edu.aitu.oop3.models.Member;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostgresMemberRepository implements MemberRepository {
     @Override
@@ -42,5 +44,26 @@ public class PostgresMemberRepository implements MemberRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<Member> findAll() {
+        List<Member> members = new ArrayList<>();
+        String sql = "SELECT id, name, email, expiry_date FROM members";
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                members.add(new Member(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getDate("expiry_date").toLocalDate()
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return members;
     }
 }

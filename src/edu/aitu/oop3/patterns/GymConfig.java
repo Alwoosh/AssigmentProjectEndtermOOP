@@ -7,10 +7,10 @@ public class GymConfig {
     private String adminPassword;
 
     private GymConfig() {
-        // Симуляция загрузки настроек
-        this.dbUrl = "jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require";
-        this.taxRate = 0.12;
-        this.adminPassword = "Medina";
+        // Загрузка настроек из переменных окружения или значения по умолчанию
+        this.dbUrl = System.getenv().getOrDefault("DB_URL", "jdbc:postgresql://localhost:5432/postgres");
+        this.taxRate = Double.parseDouble(System.getenv().getOrDefault("TAX_RATE", "0.12"));
+        this.adminPassword = System.getenv().getOrDefault("ADMIN_PASSWORD", "admin");
     }
 
     public static synchronized GymConfig getInstance() {
