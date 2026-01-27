@@ -23,7 +23,7 @@ public class Main {
     private static final AdminService adminService = new AdminService(classRepo);
 
     public static void main(String[] args) {
-        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "7070"));
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
         var app = Javalin.create(config -> {
             config.router.treatMultipleSlashesAsSingleSlash = true;
         }).start(port);
