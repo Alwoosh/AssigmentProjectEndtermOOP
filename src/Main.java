@@ -1,3 +1,5 @@
+package edu.aitu.oop3;
+
 import edu.aitu.oop3.models.*;
 import edu.aitu.oop3.patterns.GymConfig;
 import edu.aitu.oop3.repositories.*;
