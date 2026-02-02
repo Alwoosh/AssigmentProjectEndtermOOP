@@ -77,6 +77,22 @@ public class PostgresClassRepository implements ClassRepository {
     }
 
     @Override
+    public void update(FitnessClass fitnessClass) {
+        String sql = "UPDATE classes SET title = ?, instructor_name = ?, max_capacity = ?, schedule_time = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, fitnessClass.getTitle());
+            pstmt.setString(2, fitnessClass.getInstructorName());
+            pstmt.setInt(3, fitnessClass.getMaxCapacity());
+            pstmt.setTimestamp(4, Timestamp.valueOf(fitnessClass.getScheduleTime()));
+            pstmt.setInt(5, fitnessClass.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public List<FitnessClass> findAll() {
         List<FitnessClass> classes = new ArrayList<>();
         String sql = "SELECT id, title, instructor_name, max_capacity, schedule_time FROM classes";
