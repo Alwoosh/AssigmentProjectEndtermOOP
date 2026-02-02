@@ -18,7 +18,6 @@ public class DatabaseConnection {
     }
 
     private DatabaseConnection() {
-        // no instances
     }
 
     public static Connection getConnection() throws SQLException {
@@ -27,7 +26,6 @@ public class DatabaseConnection {
         String dbPass = System.getenv("DB_PASSWORD");
 
         if (dbUrl == null || dbUser == null || dbPass == null) {
-            // Фолбэк для локальной разработки, если переменные не заданы
             return DriverManager.getConnection(
                     props.getProperty("db.url"),
                     props.getProperty("db.user"),

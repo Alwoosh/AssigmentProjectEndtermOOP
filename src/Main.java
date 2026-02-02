@@ -16,11 +16,11 @@ public class Main {
     private static final ClassRepository classRepo = new PostgresClassRepository();
     private static final BookingRepository bookingRepo = new PostgresBookingRepository();
     private static final NotificationService notificationService = (member, fitnessClass) ->
-            System.out.println("[Notification] Уважаемый(ая) " + member.getName() +
-                    ", вы записаны на '" + fitnessClass.getTitle() + "'!");
+            System.out.println("[Notification] Dear " + member.getName() +
+                    ", you are booked for '" + fitnessClass.getTitle() + "'!");
 
     private static final BookingService bookingService = new BookingService(memberRepo, classRepo, bookingRepo, notificationService);
-    private static final AdminService adminService = new AdminService(classRepo);
+    private static final AdminService adminService = new AdminService(classRepo, memberRepo);
 
     public static void main(String[] args) {
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
@@ -28,12 +28,8 @@ public class Main {
             config.router.treatMultipleSlashesAsSingleSlash = true;
         }).start(port);
 
-        // --- Публичные эндпоинты ---
-
-        // Список всех классов
         app.get("/api/classes", ctx -> ctx.json(classRepo.findAll()));
 
-        // Информация об участнике
         app.get("/api/members/{id}", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
@@ -41,14 +37,13 @@ public class Main {
                 if (member != null) {
                     ctx.json(member);
                 } else {
-                    ctx.status(404).result("Участник не найден");
+                    ctx.status(404).result("Member not found");
                 }
             } catch (NumberFormatException e) {
-                ctx.status(400).result("Некорректный ID");
+                ctx.status(400).result("Invalid ID");
             }
         });
 
-        // Бронирование занятия
         app.post("/api/book", ctx -> {
             try {
                 Map<String, Object> body = ctx.bodyAsClass(Map.class);
@@ -56,26 +51,21 @@ public class Main {
                 int classId = Integer.parseInt(body.get("classId").toString());
 
                 bookingService.bookClass(memberId, classId);
-                ctx.status(201).result("Бронирование успешно!");
+                ctx.status(201).result("Booking successful!");
             } catch (Exception e) {
                 ctx.status(400).result(e.getMessage());
             }
         });
 
-        // --- Админ-панель (защищено паролем) ---
-
-        // Middleware для проверки пароля админа
         app.before("/api/admin/*", ctx -> {
             String password = ctx.header("X-Admin-Password");
             if (!GymConfig.getInstance().getAdminPassword().equals(password)) {
-                ctx.status(401).result("Ошибка доступа: Неверный пароль администратора");
+                ctx.status(401).result("Access Error: Invalid admin password");
             }
         });
 
-        // Список всех участников
         app.get("/api/admin/members", ctx -> ctx.json(memberRepo.findAll()));
 
-        // Добавить класс
         app.post("/api/admin/classes", ctx -> {
             try {
                 Map<String, Object> body = ctx.bodyAsClass(Map.class);
@@ -85,23 +75,22 @@ public class Main {
                 LocalDateTime time = LocalDateTime.parse(body.get("time").toString());
 
                 adminService.addClass(title, instructor, capacity, time);
-                ctx.status(201).result("Занятие добавлено!");
+                ctx.status(201).result("Class added!");
             } catch (Exception e) {
-                ctx.status(400).result("Ошибка при добавлении класса: " + e.getMessage());
+                ctx.status(400).result("Error adding class: " + e.getMessage());
             }
         });
 
-        // Удалить класс
         app.delete("/api/admin/classes/{id}", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
                 adminService.removeClass(id);
-                ctx.result("Запрос на удаление занятия обработан");
+                ctx.result("Class deletion request processed");
             } catch (NumberFormatException e) {
-                ctx.status(400).result("Некорректный ID");
+                ctx.status(400).result("Invalid ID");
             }
         });
 
-        System.out.println("Сервер запущен на порту: " + port);
+        System.out.println("Server started on port: " + port);
     }
 }

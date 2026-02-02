@@ -7,7 +7,6 @@ public class GymConfig {
     private String adminPassword;
 
     private GymConfig() {
-        // Загрузка настроек из переменных окружения или значения по умолчанию
         this.dbUrl = System.getenv().getOrDefault("DB_URL", "jdbc:postgresql://localhost:5432/postgres");
         this.taxRate = Double.parseDouble(System.getenv().getOrDefault("TAX_RATE", "0.12"));
         this.adminPassword = System.getenv().getOrDefault("ADMIN_PASSWORD", "admin");

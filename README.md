@@ -1,24 +1,37 @@
-# Topic 5: Fitness Club Membership & Class Booking
+# Тема 5: Абонементы фитнес-клуба и бронирование занятий
+**Группа:** IT-2515  
+**Участники:** Almansur Maxym, Kairat Bolatuly
 
-**Group:** IT-2515  
-**Members:** Almansur Maxym, Kairat Bolatuly
-
-### Project Domain
+### Предметная область
 Система управления фитнес-клубом, предназначенная для администрирования абонементов, управления расписанием классов и учета бронирований.
 
-### Core Entities (Milestone 1)
+### Основные сущности (Milestone 1)
 *   **Member:** Данные о клиенте клуба.
 *   **Membership:** Информация о статусе и типе абонемента.
 *   **FitnessClass:** Групповые занятия с ограничением по количеству мест.
 *   **ClassBooking:** Записи клиентов на конкретные занятия.
 
-### Architecture & SOLID
-*   **Repository Pattern:** Доступ к данным реализован через интерфейсы (`MemberRepository`, `ClassRepository`, `BookingRepository`) для обеспечения независимости от конкретной БД.
+### Milestone 2 (Паттерны проектирования и возможности языка)
+В рамках Milestone 2 были добавлены следующие возможности:
+
+1.  **Generic Repository:** Реализован интерфейс `Repository<T>` для стандартизации доступа к данным различных сущностей. `MemberRepository` и `ClassRepository` теперь расширяют этот общий интерфейс.
+2.  **Advanced Factory:** `MembershipFactory` был расширен для поддержки `VisitBasedMembership` (на 10 посещений), в дополнение к ежемесячным и годовым типам.
+3.  **Лямбда-выражения и функциональные интерфейсы:**
+    *   Используются в `AdminService.extendMemberships` для фильтрации участников, которым требуется продление.
+    *   `GenericFilter<T>` использует `java.util.function.Predicate` для фильтрации списков сущностей.
+    *   `NotificationService` является функциональным интерфейсом, используемым как стратегия для отправки уведомлений.
+4.  **Паттерн Singleton:** `GymConfig` обеспечивает централизованную конфигурацию (налоговые ставки, пароли, URL-адреса БД) во всем приложении.
+5.  **Паттерн Builder:** `TrainingPlan` использует статический вложенный класс `Builder` для создания сложных планов тренировок с множеством параметров.
+6.  **Новая функция (интеграция):** Добавлена функция «Массовое продление» в `AdminService`, которая объединяет универсальный репозиторий, `GenericFilter` с лямбда-выражениями и бизнес-логику для продления абонементов участников, срок действия которых скоро истекает.
+
+### Архитектура и SOLID
+*   **Repository Pattern:** Доступ к данным реализован через интерфейсы (`MemberRepository`, `ClassRepository`, `BookingRepository`) для обеспечения независимости от конкретной базы данных.
 *   **Service Layer:** Бизнес-логика вынесена в отдельные сервисы (`AdminService`, `BookingService`).
 *   **Database:** Интеграция с PostgreSQL/Supabase через JDBC API.
 *   **Exception Handling:** Реализованы кастомные исключения для обработки бизнес-ошибок (`MembershipExpiredException`, `ClassFullException`, `BookingAlreadyExistsException`).
-*   **Design Patterns:**
+*   **Паттерны проектирования:**
     *   **Singleton:** `GymConfig` для централизованного управления конфигурацией.
     *   **Factory Method:** `MembershipFactory` для создания различных типов абонементов.
     *   **Builder:** `TrainingPlan.Builder` для гибкого создания планов тренировок.
     *   **Strategy (Lambda):** `NotificationService` для гибкой отправки уведомлений.
+    *   **Generic Repository:** `Repository<T>` для стандартизированного доступа к данным.

@@ -30,36 +30,31 @@ public class BookingService {
     public void bookClass(int memberId, int classId)
             throws MembershipExpiredException, ClassFullException, BookingAlreadyExistsException {
 
-        // 1. Получаем данные
         Member member = memberRepo.findById(memberId);
         FitnessClass fitnessClass = classRepo.findById(classId);
 
         if (member == null) {
-            throw new IllegalArgumentException("Участник не найден");
+            throw new IllegalArgumentException("Member not found");
         }
         if (fitnessClass == null) {
-            throw new IllegalArgumentException("Занятие не найдено");
+            throw new IllegalArgumentException("Class not found");
         }
 
-        // 2. Проверка: Активен ли абонемент?
         if (member.getExpiryDate().isBefore(LocalDate.now())) {
-            throw new MembershipExpiredException("Ваш абонемент истек!");
+            throw new MembershipExpiredException("Your membership has expired!");
         }
 
-        // 3. Проверка: Есть ли место в классе?
         int currentCount = classRepo.getCurrentBookingCount(classId);
         if (currentCount >= fitnessClass.getMaxCapacity()) {
-            throw new ClassFullException("В классе нет свободных мест.");
+            throw new ClassFullException("No available spots in this class.");
         }
 
-        // 4. Проверка: Уже записан?
         if (bookingRepo.exists(memberId, classId)) {
-            throw new BookingAlreadyExistsException("Вы уже записаны на это занятие.");
+            throw new BookingAlreadyExistsException("You are already booked for this class.");
         }
 
-        // 5. Сохранение и Уведомление
         bookingRepo.save(memberId, classId);
         notificationService.sendBookingConfirmation(member, fitnessClass);
-        System.out.println("Бронирование успешно завершено!");
+        System.out.println("Booking successfully completed!");
     }
 }
